@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Student {
+  id          String       @id
+  name        String
+  region      String
+  joinedOn    DateTime     @map("joined_on")
+  enrollments Enrollment[]
+
+  @@map("students")
+}
+
+model Course {
+  id            String       @id
+  title         String
+  category      String
+  level         String
+  instructor    String
+  durationWeeks Int          @map("duration_weeks")
+  enrollments   Enrollment[]
+
+  @@map("courses")
+}
+
+model Enrollment {
+  id               Int      @id @default(autoincrement())
+  studentId        String   @map("student_id")
+  courseId         String   @map("course_id")
+  enrolledOn       DateTime @map("enrolled_on")
+  completionStatus String   @map("completion_status")
+  grade            String?
+  rating           Int
+  feePaid          Int      @map("fee_paid")
+
+  student Student @relation(fields: [studentId], references: [id])
+  course  Course  @relation(fields: [courseId], references: [id])
+
+  @@unique([studentId, courseId])
+  @@map("enrollments")
+}
+
+model User {
+  id           Int     @id @default(autoincrement())
+  email        String  @unique
+  passwordHash String  @map("password_hash")
+  role         String
+  region       String?
+
+  @@map("users")
+}
